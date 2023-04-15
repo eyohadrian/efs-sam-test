@@ -119,13 +119,13 @@ Resources:
           OwnerGid: 1000
           Permissions: "0755"
 
-  HelloWorldFunction:
+  GetEfsFileContent:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     DependsOn:
       - MyEFSMountTarget
     Properties:
-      CodeUri: hello_world/
-      Handler: app.lambda_handler
+      CodeUri: efs_content/
+      Handler: get_file.lambda_handler
       Runtime: python3.9
       Role: !GetAtt HelloWorldFR.Arn
       Architectures:
@@ -134,8 +134,34 @@ Resources:
         HelloWorld:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /hello
+            Path: /get_file_content
             Method: get
+      VpcConfig:
+        SecurityGroupIds:
+          - !GetAtt MySecurityGroup.GroupId
+        SubnetIds:
+          - !Ref MySubnet
+      FileSystemConfigs:
+        - Arn: !GetAtt MyEFSAccessPoint.Arn
+          LocalMountPath: /mnt/efs
+
+  PostEfsFileContent:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    DependsOn:
+      - MyEFSMountTarget
+    Properties:
+      CodeUri: efs_content/
+      Handler: post_file.lambda_handler
+      Runtime: python3.9
+      Role: !GetAtt HelloWorldFR.Arn
+      Architectures:
+        - x86_64
+      Events:
+        HelloWorld:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /post_file_content
+            Method: post
       VpcConfig:
         SecurityGroupIds:
           - !GetAtt MySecurityGroup.GroupId
@@ -149,12 +175,18 @@ Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
+  GetEfsFileContentApi:
     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/get_file_content/"
+  PostEfsFileContentApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/post_file_content/"
+  GetEfsFileContent:
+    Description: "Get Lambda Function ARN"
+    Value: !GetAtt GetEfsFileContent.Arn
+  PostEfsFileContent:
+    Description: "Post Lambda Function ARN"
+    Value: !GetAtt PostEfsFileContent.Arn
   HelloWorldFunctionIamRole:
     Description: "Implicit IAM Role created for Hello World function"
     Value: !GetAtt HelloWorldFR.Arn
