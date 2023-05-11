@@ -124,9 +124,8 @@ Resources:
     DependsOn:
       - MyEFSMountTarget
     Properties:
+      PackageType: Image
       CodeUri: efs_content/
-      Handler: get_file.lambda_handler
-      Runtime: python3.9
       Role: !GetAtt HelloWorldFR.Arn
       Architectures:
         - x86_64
@@ -144,6 +143,10 @@ Resources:
       FileSystemConfigs:
         - Arn: !GetAtt MyEFSAccessPoint.Arn
           LocalMountPath: /mnt/efs
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./efs_content
+      DockerTag: python3.9-v1
 
   PostEfsFileContent:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
