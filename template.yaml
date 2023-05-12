@@ -125,7 +125,7 @@ Resources:
       - MyEFSMountTarget
     Properties:
       PackageType: Image
-      CodeUri: efs_content/
+      CodeUri: get_content/
       Role: !GetAtt HelloWorldFR.Arn
       Architectures:
         - x86_64
@@ -145,7 +145,7 @@ Resources:
           LocalMountPath: /mnt/efs
     Metadata:
       Dockerfile: Dockerfile
-      DockerContext: ./efs_content
+      DockerContext: ./get_content
       DockerTag: python3.9-v1
 
   PostEfsFileContent:
@@ -153,9 +153,8 @@ Resources:
     DependsOn:
       - MyEFSMountTarget
     Properties:
-      CodeUri: efs_content/
-      Handler: post_file.lambda_handler
-      Runtime: python3.9
+      CodeUri: post_content/
+      PackageType: Image
       Role: !GetAtt HelloWorldFR.Arn
       Architectures:
         - x86_64
@@ -173,6 +172,10 @@ Resources:
       FileSystemConfigs:
         - Arn: !GetAtt MyEFSAccessPoint.Arn
           LocalMountPath: /mnt/efs
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./post_content
+      DockerTag: python3.9-v1
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

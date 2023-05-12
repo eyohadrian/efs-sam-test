@@ -7,4 +7,4 @@ s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-12kw5dkcfzumw"
 s3_prefix = "test-efs"
 region = "eu-west-3"
 capabilities = "CAPABILITY_IAM"
-image_repositories = ["GetEfsFileContent=725476870208.dkr.ecr.eu-west-3.amazonaws.com/testefs9780dc17/getefsfilecontent4e2b6f49repo"]
+image_repositories = ["GetEfsFileContent=725476870208.dkr.ecr.eu-west-3.amazonaws.com/testefs9780dc17/getefsfilecontent4e2b6f49repo", "PostEfsFileContent=725476870208.dkr.ecr.eu-west-3.amazonaws.com/testefs9780dc17/postefsfilecontent1de03428repo"]
